@@ -1,0 +1,47 @@
+********   zabrana direktnog menjanja value kolone  ******** 
+CREATE OR REPLACE TRIGGER orderitem_update_value
+BEFORE
+UPDATE OF valuee ON orderitem
+FOR EACH ROW
+BEGIN
+RAISE_APPLICATION_ERROR(
+NUM => -20002,
+MSG => 'Value ne moze direktno da se menja!'
+ );
+END;
+
+******** svaki put kada se update-uje price u product tabeli, update-ovace se i value u orderitem tabeli ******** 
+CREATE OR REPLACE TRIGGER product_update_triger
+AFTER
+UPDATE OF price ON product
+FOR EACH ROW
+DECLARE PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+EXECUTE IMMEDIATE 'ALTER TRIGGER product_update_adresa DISABLE';
+EXECUTE IMMEDIATE 'ALTER TRIGGER product_insert_update DISABLE';
+UPDATE orderitem
+SET valuee=:NEW.price
+WHERE id_prod=:NEW.prod_id;
+EXECUTE IMMEDIATE 'ALTER TRIGGER product_update_adresa ENABLE';
+EXECUTE IMMEDIATE 'ALTER TRIGGER product_insert_update ENABLE';
+END;
+
+TRIGER #2
+Kada se unosi novi red u tabelu User, dateCreate se postavlja na trenutni datum i vreme.
+
+create trigger set_datecreate_at
+  before insert on userr
+  for each row
+begin
+  :new.datecreate := sysdate;
+end;
+
+TRIGER #3
+Kada se izvrsi update reda u tabeli User, dateEdit se postavlja na trenutni datum i vreme.
+
+create trigger set_dateedit_at
+  before update on userr
+  for each row
+begin
+  :new.dateedit := sysdate;
+end;

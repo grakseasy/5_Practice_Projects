@@ -1,0 +1,92 @@
+TRIGER #1
+Pravljenje veze izmedju `value` kolone iz child tabele OrderItem, sa kolonom `price` iz parent tabele Product.
+
+********   triger za povezivanje value/price iz orderitem/product  ******** 
+CREATE OR REPLACE TRIGGER orderitem_insert_update
+BEFORE
+INSERT OR UPDATE ON orderitem
+FOR EACH ROW
+DECLARE
+o_value number(10);
+BEGIN
+SELECT price
+INTO o_value
+FROM product
+WHERE prod_id =:NEW.id_prod;
+:NEW.valuee:=o_value;
+END;
+
+
+a)a) Prikažite sve kororisnike koji su se prijavili u prethodna dva dana
+
+SELECT firstname, lastname
+ FROM userr
+  WHERE dateedit > trunc(sysdate-2)
+
+
+b) Prikažite ime I prezime korisnika, id porudžbine I ukupnu vrednost svih porudžbinama
+x
+
+
+c) Prikažite sve korisnike koji su imali najmanje dve porudžbine
+
+SELECT
+    userr.firstname,
+    userr.lastName,
+    COUNT(distinct orders.order_id) AS broj_porudzbina  
+FROM
+    userr
+    INNER JOIN orders ON orders.id_user = userr.user_id 
+GROUP BY
+    userr.lastName, userr.firstname
+having COUNT(distinct orders.order_id) >= 2
+
+
+
+d) Prikažite ime I prezime korisnika, id porudžbine I broj stavki za svaku porudžbinu
+
+SELECT
+    userr.firstname, userr.lastname,
+    orderitem.id_order,
+    COUNT(orderitem.id_order) AS broj_stavki
+FROM
+    userr
+    INNER JOIN orders ON orders.id_user = userr.user_id
+         INNER JOIN orderitem ON orderitem.id_order = orders.order_id
+GROUP BY
+    userr.firstname, userr.lastname, orderitem.id_order
+
+
+
+e) Prikažite ime I prezime korisnika, id porudžbine koja ima najmanje dve stavke
+
+SELECT
+    userr.firstname, userr.lastname,
+    orderitem.id_order,
+    COUNT(orderitem.id_order) AS broj_stavki
+FROM
+    userr
+    INNER JOIN orders ON orders.id_user = userr.user_id
+         INNER JOIN orderitem ON orderitem.id_order = orders.order_id
+GROUP BY
+    userr.firstname, userr.lastname, orderitem.id_order
+HAVING COUNT(distinct orderitem.id_prod) >= 2
+
+
+
+
+f) Prikažite sve korisnike koji su kupili najmanje tri različita proizvoda u svim porudžbinama   
+   
+SELECT
+    userr.firstname,
+    COUNT(distinct orders.order_id) AS num_orders,
+    COUNT(distinct orderitem.id_prod) AS num_distinct_products
+FROM
+    userr
+    INNER JOIN orders ON orders.id_user = userr.user_id
+         INNER JOIN orderitem ON orderitem.id_order = orders.order_id
+GROUP BY
+    userr.firstname
+HAVING COUNT(distinct orderitem.id_prod) >= 3
+
+

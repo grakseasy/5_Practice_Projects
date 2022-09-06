@@ -1,0 +1,7 @@
+Radio sam u Oracle APEX-u, jer sam imao problema sa MySQL bazom. Uz kod dostavljam slike rezultata izvrsavanja SQL upita.
+
+
+
+Neke tabele i kolone imaju drugačiji naziv od onih koji zadati u postavci zadatka,
+a to je zato što su reči poput Order, value, User i slično
+rezervisane reči u Oracle-u koje ne mogu da se koristi (Pa je zato User --> Userr itd.)
